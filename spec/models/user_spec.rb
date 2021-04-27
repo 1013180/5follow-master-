@@ -1,30 +1,46 @@
 require 'rails_helper'
 
-RSpec.describe 'Bookモデルのテスト', type: :model do
+RSpec.describe 'Userモデルのテスト', type: :model do
   describe 'バリデーションのテスト' do
-    subject { book.valid? }
+    subject { user.valid? }
 
-    let(:user) { create(:user) }
-    let!(:book) { build(:book, user_id: user.id) }
+    let!(:other_user) { create(:user) }
+    let(:user) { build(:user) }
 
-    context 'titleカラム' do
+    context 'nameカラム' do
       it '空欄でないこと' do
-        book.title = ''
+        user.name = ''
+        is_expected.to eq false
+      end
+      it '2文字以上であること: 1文字は×' do
+        user.name = Faker::Lorem.characters(number: 1)
+        is_expected.to eq false
+      end
+      it '2文字以上であること: 2文字は〇' do
+        user.name = Faker::Lorem.characters(number: 2)
+        is_expected.to eq true
+      end
+      it '20文字以下であること: 20文字は〇' do
+        user.name = Faker::Lorem.characters(number: 20)
+        is_expected.to eq true
+      end
+      it '20文字以下であること: 21文字は×' do
+        user.name = Faker::Lorem.characters(number: 21)
+        is_expected.to eq false
+      end
+      it '一意性があること' do
+        user.name = other_user.name
         is_expected.to eq false
       end
     end
 
-    context 'bodyカラム' do
-      it '空欄でないこと' do
-        book.body = ''
-        is_expected.to eq false
-      end
-      it '200文字以下であること: 200文字は〇' do
-        book.body = Faker::Lorem.characters(number: 200)
+    context 'introductionカラム' do
+      it '50文字以下であること: 50文字は〇' do
+        user.introduction = Faker::Lorem.characters(number: 50)
         is_expected.to eq true
       end
-      it '200文字以下であること: 201文字は×' do
-        book.body = Faker::Lorem.characters(number: 201)
+      it '50文字以下であること: 51文字は×' do
+        user.introduction = Faker::Lorem.characters(number: 51)
         is_expected.to eq false
       end
     end
